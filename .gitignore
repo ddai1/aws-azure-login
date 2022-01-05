@@ -32,3 +32,5 @@ node_modules
 .vscode
 
 lib
+# not check in any dist files
+dist

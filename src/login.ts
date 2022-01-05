@@ -5,7 +5,7 @@ import zlib from "zlib";
 import AWS from "aws-sdk";
 import cheerio from "cheerio";
 import { v4 } from "uuid";
-import puppeteer, { HTTPRequest } from "puppeteer";
+import puppeteer, { HTTPRequest } from "puppeteer-core";
 import querystring from "querystring";
 import _debug from "debug";
 import { CLIError } from "./CLIError";
