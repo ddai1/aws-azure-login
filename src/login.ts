@@ -5,7 +5,7 @@ import zlib from "zlib";
 import AWS from "aws-sdk";
 import cheerio from "cheerio";
 import { v4 } from "uuid";
-import puppeteer, { HTTPRequest } from "puppeteer";
+import puppeteer, { HTTPRequest } from "puppeteer-core";
 import querystring from "querystring";
 import _debug from "debug";
 import { CLIError } from "./CLIError";
@@ -27,6 +27,10 @@ const AZURE_AD_SSO = "autologon.microsoftazuread-sso.com";
 const AWS_SAML_ENDPOINT = "https://signin.aws.amazon.com/saml";
 const AWS_CN_SAML_ENDPOINT = "https://signin.amazonaws.cn/saml";
 const AWS_GOV_SAML_ENDPOINT = "https://signin.amazonaws-us-gov.com/saml";
+
+// Google Chrome path
+const MACOS_CHROME_PATH = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+const LINUX_CHROME_PATH = '/usr/bin/google-chrome';
 
 interface Role {
   roleArn: string;
@@ -411,12 +415,25 @@ export const login = {
 
     console.log("Using AWS SAML endpoint", assertionConsumerServiceURL);
 
+    const osPlatform = process.platform;
+    let executablePath = "";
+    if (osPlatform === "darwin") {
+      executablePath = MACOS_CHROME_PATH;
+    }else if (osPlatform === "linux") {
+      executablePath = LINUX_CHROME_PATH;
+    } else {
+      throw new CLIError("We don't support this platform yet.")
+    }
+
+    console.log("Using the chrome from this path:", executablePath);
+
     const loginUrl = await this._createLoginUrlAsync(
       profile.azure_app_id_uri,
       profile.azure_tenant_id,
       assertionConsumerServiceURL
     );
     const samlResponse = await this._performLoginAsync(
+      executablePath,
       loginUrl,
       headless,
       disableSandbox,
@@ -602,6 +619,7 @@ export const login = {
    * @private
    */
   async _performLoginAsync(
+    executablePath: string,
     url: string,
     headless: boolean,
     disableSandbox: boolean,
@@ -644,6 +662,7 @@ export const login = {
         : [];
 
       browser = await puppeteer.launch({
+        executablePath,
         headless,
         args,
         ignoreDefaultArgs,
