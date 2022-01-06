@@ -21,7 +21,7 @@
   },
   "scripts": {
     "start": "ts-node-dev src/index.ts",
-    "build": "tsc",
+    "build": "tsc && npx pkg .",
     "watch": "tsc -w",
     "eslint": "eslint . --ext .ts",
     "prettier:write": "prettier --write \"src/**/*.{ts,json}\"",
