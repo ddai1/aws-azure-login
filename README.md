@@ -3,68 +3,33 @@
 
 # aws-azure-login
 
+## Information
+
+This is a forked repository from [sportradar/aws-azure-login](https://github.com/sportradar/aws-azure-login). The original version works perfectly on Intel Mac, but it doesn't support Silicon Mac due to some packages are not avaiable for Silicon Mac at this moment. So to get it works on my M1 Silicon Mac, I have made slightly changes to get it work.
+- Interact with local installed Google Chrome
+- Use puppeteer-core instead of puppeteer
+- Pacakge this tool into binary, so we don't need to worry about installing the dependencies.
+- The binary supports Intel Mac, Silicon Mac and Linux
+
 If your organization uses [Azure Active Directory](https://azure.microsoft.com) to provide SSO login to the AWS console, then there is no easy way to log in on the command line or to use the [AWS CLI](https://aws.amazon.com/cli/). This tool fixes that. It lets you use the normal Azure AD login (including MFA) from a command line to create a federated AWS session and places the temporary credentials in the proper place for the AWS CLI and SDKs.
+
+## Installation requirements
+
+- You must be able to extract or "unzip" the downloaded package. If your operating system doesn't have the built-in unzip command, use an equivalent.
+
+- The `aws-azure-login` binary uses local installed Google Chrome to interact the MFA w/o GUI. Make sure you've installed Google Chrome in your Mac/Linux.
 
 ## Installation
 
-Installation can be done in any of the following platform - Windows, Linux, Docker, Snap
-### Windows
+Installation can be done in any of the following platform - Intel/Silicon Mac, Linux
 
-Install [Node.js](https://nodejs.org/) v12 or higher. Then install aws-azure-login with npm:
-
-    npm install -g aws-azure-login
-
-You may need to install puppeteer dependency, if you're getting missing chrome or chromium message
-
-    node <node_modules_dir>/aws-azure-login/node_modules/puppeteer/install.js
+Download the binary from the release page, extract it and copy to the binary to the path.
 
 ### Linux
+`/usr/bin`
 
-In Linux you can either install for all users or just the current user. In either case, you must first install [Node.js](https://nodejs.org/) v12 or higher and any [puppeteer dependencies](https://github.com/GoogleChrome/puppeteer/blob/master/docs/troubleshooting.md#chrome-headless-doesnt-launch). Then follow the appropriate instructions.
-
-#### Option A: Install for All Users
-
-Install aws-azure-login globally with npm:
-
-    sudo npm install -g aws-azure-login --unsafe-perm
-
-Puppeteer doesn't install globally with execution permissions for all users so you'll need to modify them:
-
-    sudo chmod -R go+rx $(npm root -g)
-
-#### Option B: Install Only for Current User
-
-First configure npm to install global packages in [your home directory](https://docs.npmjs.com/getting-started/fixing-npm-permissions):
-
-    mkdir ~/.npm-global
-    npm config set prefix '~/.npm-global'
-    export PATH=~/.npm-global/bin:$PATH
-    source ~/.profile
-    echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.profile
-    source ~/.profile
-
-Then install aws-azure-login:
-
-    npm install -g aws-azure-login
-
-### Docker
-
-A Docker image has been built with aws-azure-login preinstalled. You simply need to run the command with a volume mounted to your AWS configuration directory.
-
-    docker run --rm -it -v ~/.aws:/root/.aws sportradar/aws-azure-login
-
-The Docker image is configured with an entrypoint so you can just feed any arguments in at the end.
-
-You can also put the docker-launch.sh script into your bin directory for the aws-azure-login command to function as usual:
-
-    sudo curl -o /usr/local/bin/aws-azure-login https://raw.githubusercontent.com/sportradar/aws-azure-login/main/docker-launch.sh -L
-    sudo chmod o+x /usr/local/bin/aws-azure-login
-
-Now just run `aws-azure-login`.
-
-### Snap
-
-https://snapcraft.io/aws-azure-login
+### Intel/Silicon Mac
+`/usr/local/bin`
 
 ## Usage
 
@@ -82,10 +47,7 @@ You'll need your [Azure Tenant ID and the App ID URI](#getting-your-tenant-id-an
 
 ##### GovCloud Support
 
-To use aws-azure-login with AWS GovCloud, set the `region` profile property in your ~/.aws/config to the one of the GovCloud regions:
-
-- us-gov-west-1
-- us-gov-east-1
+_Note:_ I DO NOT have any exsiting platform to test this feature, so please use the release from the [original repository](https://github.com/sportradar/aws-azure-login)
 
 ##### China Region Support
 
@@ -151,10 +113,6 @@ If you are logging in on an operating system with a GUI, you can log in using th
 
 Logging in with GUI mode is likely to be much more reliable.
 
-_Note:_ on Linux you will likely need to disable the Puppeteer sandbox or Chrome will fail to launch:
-
-    aws-azure-login --no-sandbox
-
 ### Behind corporate proxy
 
 If behind corporate proxy, then just set https_proxy env variable.
@@ -197,11 +155,6 @@ The Azure login page uses JavaScript, which requires a real web browser. To auto
 The nature of browser automation with Puppeteer means the solution is bit brittle. A minor change on the Microsoft side could break the tool. If something isn't working, you can fall back to GUI mode (above). To debug an issue, you can run in debug mode (--mode debug) to see the GUI while aws-azure-login tries to populate it. You can also have the tool print out more detail on what it is doing to try to do in order to diagnose. aws-azure-login uses the [Node debug module](https://www.npmjs.com/package/debug) to print out debug info. Just set the DEBUG environmental variable to 'aws-azure-login'. On Linux/OS X:
 
     DEBUG=aws-azure-login aws-azure-login
-
-On Windows:
-
-    set DEBUG=aws-azure-login
-    aws-azure-login
 
 ## Support for Other Authentication Providers
 
