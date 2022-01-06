@@ -35,7 +35,7 @@
     "assets":[
       "node_modules/**/*" 
     ],
-    "targets": ["node16-macos"],
+    "targets": ["node16-macos", "node16-linux"],
     "outputPath": "dist"
   },
   "dependencies": {
